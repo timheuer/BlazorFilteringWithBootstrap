@@ -28,17 +28,19 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var forecast in forecasts)
-            {
-                if (!IsVisible(forecast))
-                    continue;
-                <tr>
-                    <td>@forecast.Date.ToShortDateString()</td>
-                    <td>@forecast.TemperatureC</td>
-                    <td>@forecast.TemperatureF</td>
-                    <td>@forecast.Summary</td>
-                </tr>
-            }
+            <Virtualize Context="forecast" TItem="WeatherForecast" Items="@forecasts">
+                <ItemContent>
+                    <tr>
+                        <td>@forecast.Date.ToShortDateString()</td>
+                        <td>@forecast.TemperatureC</td>
+                        <td>@forecast.TemperatureF</td>
+                        <td>@forecast.Summary</td>
+                    </tr>
+                </ItemContent>
+                <Placeholder>
+                    <div>Loading more forecasts...</div>
+                </Placeholder>
+            </Virtualize>
         </tbody>
     </table>
 }
