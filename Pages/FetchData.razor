@@ -1,0 +1,69 @@
+﻿@page "/fetchdata"
+
+@using BlazorFilteringWithBootstrap.Data
+@inject WeatherForecastService ForecastService
+
+<h1>Weather forecast</h1>
+
+<p>This component demonstrates fetching data from a service.</p>
+
+@if (forecasts == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="form-group">
+        <input class="form-control" type="text" placeholder="Filter..." 
+               @bind="Filter" 
+               @bind:event="oninput">
+    </div>
+    <table class="table table-striped">
+        <thead class="thead-light">
+            <tr>
+                <th scope="col">Date</th>
+                <th scope="col">Temp. (C)</th>
+                <th scope="col">Temp. (F)</th>
+                <th scope="col">Summary</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var forecast in forecasts)
+            {
+                if (!IsVisible(forecast))
+                    continue;
+                <tr>
+                    <td>@forecast.Date.ToShortDateString()</td>
+                    <td>@forecast.TemperatureC</td>
+                    <td>@forecast.TemperatureF</td>
+                    <td>@forecast.Summary</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private WeatherForecast[] forecasts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
+    }
+
+    public string Filter { get; set; }
+
+    public bool IsVisible(WeatherForecast forecast)
+    {
+        if (string.IsNullOrEmpty(Filter))
+            return true;
+
+        if (forecast.Summary.Contains(Filter, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (forecast.TemperatureC.ToString().StartsWith(Filter) || forecast.TemperatureF.ToString().StartsWith(Filter))
+            return true;
+
+        return false;
+    }
+}
